@@ -26,21 +26,26 @@ def is_date_format(value):
                 return True
     return False
 
+# Hàm kiểm tra xem giá trị có phải là số nguyên không
+def is_integer(value):
+    try:
+        return float(value).is_integer()
+    except ValueError:
+        return False
+
 # Hàm suy luận kiểu dữ liệu
 def infer_data_type(sample_value, column_name):
-    if "ngay" in column_name.lower():
+    sample_value = str(sample_value).strip()  # Chuyển giá trị về chuỗi để xử lý
+    if "ngay" in column_name.lower() or is_date_format(sample_value):
         return "DATE"
-    if isinstance(sample_value, str) and sample_value.strip().upper() == "INT":
+    elif is_integer(sample_value):
         return "INTEGER"
-    elif sample_value == "":
-        return "TEXT"
-    elif isinstance(sample_value, str) and is_date_format(sample_value):
-        return "DATE"
-    elif isinstance(sample_value, (int, float)):
+    try:
+        # Kiểm tra nếu là số thực (DOUBLE PRECISION)
+        float(sample_value)
         return "DOUBLE PRECISION"
-    elif isinstance(sample_value, str):
-        return "TEXT"
-    else:
+    except ValueError:
+        # Nếu không phải số, trả về TEXT
         return "TEXT"
 
 # Hàm tạo câu lệnh CREATE TABLE từ dữ liệu nhập
@@ -124,15 +129,15 @@ with tab1:
     **Ví dụ:**
     - Ô "Tên cột":
         ```
-        Ngân hàng
-        Ngày giao dịch
-        Số tiền
+        Họ và tên
+        Ngày sinh
+        Điểm trung bình
         ```
     - Ô "Giá trị mẫu":
         ```
-        ACB
-        01/01/2025
-        1000000
+        Nguyễn Văn A
+        01/01/2000
+        8.5
         ```
     """)
 
@@ -184,7 +189,7 @@ with tab2:
     **Ví dụ:**
     | Tên cột         | Giá trị mẫu   |
     |------------------|---------------|
-    | Ngân hàng       | ACB  |
-    | Ngày giao dịch       | 01/01/2025    |
-    | Số tiền | 1000000           |
+    | Họ và tên       | Nguyễn Văn A  |
+    | Ngày sinh       | 01/01/2000    |
+    | Điểm trung bình | 8.5           |
     """)
