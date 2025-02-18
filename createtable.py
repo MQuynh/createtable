@@ -16,8 +16,9 @@ def is_date_format(value):
     if isinstance(value, str):
         value = value.strip()
         date_patterns = [
-            r'^\d{2}/\d{2}/\d{4}$',
-            r'^\d{2}-\d{2}-\d{4}$',
+            r'^\d{2}/\d{2}/\d{4}$',          # dd/mm/yyyy
+            r'^\d{2}-\d{2}-\d{4}$',          # dd-mm-yyyy
+            r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$'  # yyyy-mm-dd hh:mm:ss
         ]
         for pattern in date_patterns:
             if re.match(pattern, value):
@@ -32,6 +33,7 @@ def infer_data_type(sample_value, column_name):
     elif pd.isna(sample_value):
         return "TEXT"
     elif isinstance(sample_value, str) and is_date_format(sample_value):
+        # Nếu giá trị là định dạng ngày, trả về kiểu DATE
         return "DATE"
     elif isinstance(sample_value, (int, float)):
         return "DOUBLE PRECISION"
