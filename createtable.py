@@ -28,20 +28,43 @@ def is_date_format(value):
 
 # Hàm suy luận kiểu dữ liệu
 def infer_data_type(sample_value, column_name):
+    # Nếu tên cột chứa từ "ngay", suy luận kiểu DATE
     if "ngay" in column_name.lower():
         return "DATE"
+    
+    # Kiểm tra nếu giá trị mẫu là chuỗi "INT"
     if isinstance(sample_value, str) and sample_value.strip().upper() == "INT":
         return "INTEGER"
-    elif sample_value == "":
-        return "TEXT"
-    elif isinstance(sample_value, str) and is_date_format(sample_value):
-        return "DATE"
-    elif isinstance(sample_value, (int, float)):
+    
+    # Kiểm tra nếu là số nguyên
+    try:
+        int(sample_value)
+        return "INTEGER"
+    except ValueError:
+        pass
+
+    # Kiểm tra nếu là số thực
+    try:
+        float(sample_value)
         return "DOUBLE PRECISION"
-    elif isinstance(sample_value, str):
-        return "TEXT"
-    else:
-        return "TEXT"
+    except ValueError:
+        pass
+
+    # Kiểm tra nếu là ngày tháng
+    if isinstance(sample_value, str) and is_date_format(sample_value):
+        return "DATE"
+
+    # Nếu không khớp bất kỳ điều kiện nào, mặc định là TEXT
+    return "TEXT"
+
+
+    # Kiểm tra nếu là ngày tháng
+    if isinstance(sample_value, str) and is_date_format(sample_value):
+        return "DATE"
+
+    # Nếu không khớp bất kỳ điều kiện nào, mặc định là TEXT
+    return "TEXT"
+
 
 # Hàm tạo câu lệnh CREATE TABLE từ dữ liệu nhập
 def generate_create_table_sql(data, table_name):
