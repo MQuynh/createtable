@@ -72,27 +72,6 @@ tab1, tab2 = st.tabs(["Nhập dữ liệu trực tiếp", "Đính kèm tệp"])
 
 # Tab 1: Nhập dữ liệu trực tiếp
 with tab1:
-    st.write("""
-    ### Hướng dẫn nhập liệu:
-    Nhập danh sách **tên cột** và **giá trị mẫu** tương ứng theo cách song song:
-    - Mỗi dòng của ô "Tên cột" tương ứng với một dòng của ô "Giá trị mẫu".
-    - Số lượng dòng trong hai ô phải bằng nhau.
-
-    **Ví dụ:**
-    - Ô "Tên cột":
-        ```
-        Họ và tên
-        Ngày sinh
-        Điểm trung bình
-        ```
-    - Ô "Giá trị mẫu":
-        ```
-        Nguyễn Văn A
-        01/01/2000
-        8.5
-        ```
-    """)
-
     # Khu vực nhập liệu
     col1, col2 = st.columns(2)
     with col1:
@@ -133,6 +112,29 @@ with tab1:
                     )
             except Exception as e:
                 st.error(f"Lỗi: {e}")
+
+    # Hướng dẫn nhập liệu (đưa xuống cuối)
+    st.markdown("---")
+    st.write("""
+    ### Hướng dẫn nhập liệu
+    Nhập danh sách **tên cột** và **giá trị mẫu** tương ứng theo cách song song:
+    - Mỗi dòng của ô "Tên cột" tương ứng với một dòng của ô "Giá trị mẫu".
+    - Số lượng dòng trong hai ô phải bằng nhau.
+
+    **Ví dụ:**
+    - Ô "Tên cột":
+        ```
+        Họ và tên
+        Ngày sinh
+        Điểm trung bình
+        ```
+    - Ô "Giá trị mẫu":
+        ```
+        Nguyễn Văn A
+        01/01/2000
+        8.5
+        ```
+    """)
 
 # Tab 2: Đính kèm tệp
 with tab2:
