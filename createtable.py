@@ -220,6 +220,7 @@ with tab2:
     Tải lên tệp Excel (.xlsx) hoặc CSV (.csv) với cấu trúc:
     - **Cột 1**: Tên cột.
     - **Cột 2**: Giá trị mẫu.
+    - Định dạng INTEGER giá trị mẫu điền chữ INT, mặc định số ở định dạng DOUBLE PRECISION
 
     **Ví dụ:**
     | Tên cột         | Giá trị mẫu   |
