@@ -121,7 +121,7 @@ with tab1:
                 "Giá trị mẫu": sample_values,
             }
             st.write("### Dữ liệu đã nhập:")
-            st.table(pd.DataFrame(data_preview))
+            st.dataframe(pd.DataFrame(data_preview))
 
     # Xử lý dữ liệu khi người dùng nhấn nút
     if st.button("Tạo câu lệnh SQL từ dữ liệu nhập"):
