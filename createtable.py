@@ -60,114 +60,115 @@ def generate_create_table_sql(data, table_name):
 # Giao diện Streamlit
 st.title("Tạo câu lệnh CREATE TABLE từ dữ liệu nhập hoặc tệp")
 
-# Nhập tên bảng
-table_name = st.text_input("Nhập tên bảng (table name)", placeholder="Ví dụ: my_table")
+# Nhập tên bảng (không bắt buộc)
+table_name = st.text_input("Nhập tên bảng (tùy chọn, mặc định là 'table_name')", placeholder="Ví dụ: my_table")
 
+# Nếu không nhập, sử dụng tên bảng mặc định
 if not table_name.strip():
-    st.warning("Vui lòng nhập tên bảng trước khi tiếp tục!")
-else:
-    # Tab điều hướng
-    tab1, tab2 = st.tabs(["Nhập dữ liệu trực tiếp", "Đính kèm tệp"])
+    table_name = "table_name"
 
-    # Tab 1: Nhập dữ liệu trực tiếp
-    with tab1:
-        st.write("""
-        ### Hướng dẫn nhập liệu:
-        Nhập dữ liệu hàng loạt với định dạng sau:
-        - Mỗi dòng tương ứng với một cột.
-        - Mỗi dòng gồm **Tên cột** và **Giá trị mẫu**, cách nhau bởi dấu phẩy (,).
+# Tab điều hướng
+tab1, tab2 = st.tabs(["Nhập dữ liệu trực tiếp", "Đính kèm tệp"])
 
-        **Ví dụ:**
-        ```
-        Tên cột 1, Giá trị mẫu 1
-        Tên cột 2, Giá trị mẫu 2
-        Tên cột 3, Giá trị mẫu 3
-        ```
-        """)
+# Tab 1: Nhập dữ liệu trực tiếp
+with tab1:
+    st.write("""
+    ### Hướng dẫn nhập liệu:
+    Nhập dữ liệu hàng loạt với định dạng sau:
+    - Mỗi dòng tương ứng với một cột.
+    - Mỗi dòng gồm **Tên cột** và **Giá trị mẫu**, cách nhau bởi dấu phẩy (,).
 
-        # Khu vực nhập liệu
-        bulk_input = st.text_area("Nhập dữ liệu hàng loạt", height=200, placeholder="Tên cột 1, Giá trị mẫu 1\nTên cột 2, Giá trị mẫu 2")
+    **Ví dụ:**
+    ```
+    Tên cột 1, Giá trị mẫu 1
+    Tên cột 2, Giá trị mẫu 2
+    Tên cột 3, Giá trị mẫu 3
+    ```
+    """)
 
-        # Xử lý dữ liệu khi người dùng nhấn nút
-        if st.button("Tạo câu lệnh SQL từ dữ liệu nhập"):
-            if not bulk_input.strip():
-                st.error("Vui lòng nhập dữ liệu!")
-            else:
-                try:
-                    # Chuyển dữ liệu từ text area thành danh sách các cột
-                    rows = bulk_input.strip().split("\n")
-                    data = []
-                    for row in rows:
-                        parts = row.split(",", 1)  # Tách thành 2 phần: Tên cột và Giá trị mẫu
-                        if len(parts) != 2:
-                            raise ValueError(f"Dòng không hợp lệ: {row}")
-                        col_name = parts[0].strip()
-                        sample_value = parts[1].strip()
-                        data.append({"Tên cột": col_name, "Giá trị mẫu": sample_value})
+    # Khu vực nhập liệu
+    bulk_input = st.text_area("Nhập dữ liệu hàng loạt", height=200, placeholder="Tên cột 1, Giá trị mẫu 1\nTên cột 2, Giá trị mẫu 2")
 
-                    # Sinh câu lệnh SQL
-                    sql_output = generate_create_table_sql(data, table_name)
-                    st.subheader("Câu lệnh CREATE TABLE:")
-                    st.code(sql_output, language="sql")
-
-                    # Nút tải xuống file SQL
-                    sql_file_name = f"{table_name}.sql"
-                    st.download_button(
-                        label="Tải xuống file SQL",
-                        data=sql_output,
-                        file_name=sql_file_name,
-                        mime="text/sql",
-                    )
-                except Exception as e:
-                    st.error(f"Lỗi: {e}")
-
-    # Tab 2: Đính kèm tệp
-    with tab2:
-        st.write("""
-        ### Hướng dẫn đính kèm tệp:
-        Tải lên tệp Excel (.xlsx) hoặc CSV (.csv) với cấu trúc:
-        - **Cột 1**: Tên cột.
-        - **Cột 2**: Giá trị mẫu.
-
-        **Ví dụ:**
-        | Tên cột       | Giá trị mẫu   |
-        |---------------|---------------|
-        | Họ và tên     | Nguyễn Văn A  |
-        | Ngày sinh     | 01/01/2000    |
-        | Điểm trung bình | 8.5         |
-        """)
-
-        # Khu vực tải lên tệp
-        uploaded_file = st.file_uploader("Tải lên tệp Excel hoặc CSV", type=["xlsx", "csv"])
-
-        if uploaded_file is not None:
+    # Xử lý dữ liệu khi người dùng nhấn nút
+    if st.button("Tạo câu lệnh SQL từ dữ liệu nhập"):
+        if not bulk_input.strip():
+            st.error("Vui lòng nhập dữ liệu!")
+        else:
             try:
-                # Đọc dữ liệu từ tệp
-                if uploaded_file.name.endswith(".csv"):
-                    df = pd.read_csv(uploaded_file)
-                else:
-                    df = pd.read_excel(uploaded_file)
+                # Chuyển dữ liệu từ text area thành danh sách các cột
+                rows = bulk_input.strip().split("\n")
+                data = []
+                for row in rows:
+                    parts = row.split(",", 1)  # Tách thành 2 phần: Tên cột và Giá trị mẫu
+                    if len(parts) != 2:
+                        raise ValueError(f"Dòng không hợp lệ: {row}")
+                    col_name = parts[0].strip()
+                    sample_value = parts[1].strip()
+                    data.append({"Tên cột": col_name, "Giá trị mẫu": sample_value})
 
-                # Kiểm tra định dạng tệp
-                if df.shape[1] < 2:
-                    st.error("Tệp phải có ít nhất 2 cột: 'Tên cột' và 'Giá trị mẫu'.")
-                else:
-                    # Đổi tên cột để đồng nhất
-                    df.columns = ["Tên cột", "Giá trị mẫu"]
-                    data = df.to_dict(orient="records")
+                # Sinh câu lệnh SQL
+                sql_output = generate_create_table_sql(data, table_name)
+                st.subheader("Câu lệnh CREATE TABLE:")
+                st.code(sql_output, language="sql")
 
-                    # Sinh câu lệnh SQL
-                    sql_output = generate_create_table_sql(data, table_name)
-                    st.subheader("Câu lệnh CREATE TABLE:")
-                    st.code(sql_output, language="sql")
-
-                    # Nút tải xuống file SQL
-                    sql_file_name = f"{table_name}.sql"
-                    st.download_button(
-                        label="Tải xuống file SQL",
-                        data=sql_output,
-                        file_name=sql_file_name,
-                        mime="text/sql",
-                    )
+                # Nút tải xuống file SQL
+                sql_file_name = f"{table_name}.sql"
+                st.download_button(
+                    label="Tải xuống file SQL",
+                    data=sql_output,
+                    file_name=sql_file_name,
+                    mime="text/sql",
+                )
             except Exception as e:
-                st.error(f"Lỗi khi xử lý tệp: {e}")
+                st.error(f"Lỗi: {e}")
+
+# Tab 2: Đính kèm tệp
+with tab2:
+    st.write("""
+    ### Hướng dẫn đính kèm tệp:
+    Tải lên tệp Excel (.xlsx) hoặc CSV (.csv) với cấu trúc:
+    - **Cột 1**: Tên cột.
+    - **Cột 2**: Giá trị mẫu.
+
+    **Ví dụ:**
+    | Tên cột       | Giá trị mẫu   |
+    |---------------|---------------|
+    | Họ và tên     | Nguyễn Văn A  |
+    | Ngày sinh     | 01/01/2000    |
+    | Điểm trung bình | 8.5         |
+    """)
+
+    # Khu vực tải lên tệp
+    uploaded_file = st.file_uploader("Tải lên tệp Excel hoặc CSV", type=["xlsx", "csv"])
+
+    if uploaded_file is not None:
+        try:
+            # Đọc dữ liệu từ tệp
+            if uploaded_file.name.endswith(".csv"):
+                df = pd.read_csv(uploaded_file)
+            else:
+                df = pd.read_excel(uploaded_file)
+
+            # Kiểm tra định dạng tệp
+            if df.shape[1] < 2:
+                st.error("Tệp phải có ít nhất 2 cột: 'Tên cột' và 'Giá trị mẫu'.")
+            else:
+                # Đổi tên cột để đồng nhất
+                df.columns = ["Tên cột", "Giá trị mẫu"]
+                data = df.to_dict(orient="records")
+
+                # Sinh câu lệnh SQL
+                sql_output = generate_create_table_sql(data, table_name)
+                st.subheader("Câu lệnh CREATE TABLE:")
+                st.code(sql_output, language="sql")
+
+                # Nút tải xuống file SQL
+                sql_file_name = f"{table_name}.sql"
+                st.download_button(
+                    label="Tải xuống file SQL",
+                    data=sql_output,
+                    file_name=sql_file_name,
+                    mime="text/sql",
+                )
+        except Exception as e:
+            st.error(f"Lỗi khi xử lý tệp: {e}")
