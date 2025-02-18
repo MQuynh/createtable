@@ -105,6 +105,24 @@ with tab1:
     with col2:
         sample_values_input = st.text_area("Giá trị mẫu", height=200, placeholder="Nhập danh sách giá trị mẫu, mỗi dòng một giá trị")
 
+    # Hiển thị số thứ tự khi người dùng nhập liệu
+    if column_names_input.strip() and sample_values_input.strip():
+        column_names = column_names_input.strip().split("\n")
+        sample_values = sample_values_input.strip().split("\n")
+
+        # Kiểm tra số lượng dòng
+        if len(column_names) != len(sample_values):
+            st.error("Số lượng dòng giữa 'Tên cột' và 'Giá trị mẫu' không khớp!")
+        else:
+            # Tạo bảng hiển thị số thứ tự, tên cột và giá trị mẫu
+            data_preview = {
+                "STT": list(range(1, len(column_names) + 1)),
+                "Tên cột": column_names,
+                "Giá trị mẫu": sample_values,
+            }
+            st.write("### Dữ liệu đã nhập:")
+            st.dataframe(pd.DataFrame(data_preview))
+
     # Xử lý dữ liệu khi người dùng nhấn nút
     if st.button("Tạo câu lệnh SQL từ dữ liệu nhập"):
         if not column_names_input.strip() or not sample_values_input.strip():
@@ -161,6 +179,7 @@ with tab1:
         8000
         ```
     """)
+
 
 # Tab 2: Đính kèm tệp
 with tab2:
