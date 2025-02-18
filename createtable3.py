@@ -33,6 +33,66 @@ def is_date_format(value):
                 return True
     return False
 
+# Hàm chuẩn hóa và xử lý dữ liệu sau khi tải lên tệp
+def process_uploaded_file(df):
+    # Chuẩn hóa lại dữ liệu từ file Excel
+    for index, row in df.iterrows():
+        # Kiểm tra và ép kiểu đối với giá trị mẫu
+        sample_value = row['Giá trị mẫu']
+        if isinstance(sample_value, str):
+            # Kiểm tra xem giá trị có phải là số không (loại bỏ dấu phân cách nghìn)
+            normalized_value = sample_value.replace(",", "").replace(".", "")
+            if normalized_value.isdigit():
+                df.at[index, 'Giá trị mẫu'] = int(normalized_value)
+            else:
+                try:
+                    # Kiểm tra nếu giá trị có thể là một số thực
+                    df.at[index, 'Giá trị mẫu'] = float(normalized_value)
+                except ValueError:
+                    pass  # Nếu không phải số, giữ lại giá trị ban đầu
+    
+    # Đảm bảo các cột có kiểu dữ liệu phù hợp sau khi xử lý
+    return df
+
+# Hàm xử lý khi tệp Excel được tải lên
+with tab2:
+    uploaded_file = st.file_uploader("Tải lên tệp Excel hoặc CSV", type=["xlsx", "csv"])
+
+    if uploaded_file is not None:
+        try:
+            # Đọc dữ liệu từ tệp
+            if uploaded_file.name.endswith(".csv"):
+                df = pd.read_csv(uploaded_file)
+            else:
+                df = pd.read_excel(uploaded_file)
+
+            # Kiểm tra định dạng tệp
+            if df.shape[1] < 2:
+                st.error("Tệp phải có ít nhất 2 cột: 'Tên cột' và 'Giá trị mẫu'.")
+            else:
+                # Chuẩn hóa và xử lý dữ liệu
+                df.columns = ["Tên cột", "Giá trị mẫu"]
+                df = process_uploaded_file(df)  # Chạy hàm chuẩn hóa dữ liệu
+
+                # Tạo dữ liệu từ dataframe đã chuẩn hóa
+                data = df.to_dict(orient="records")
+
+                # Sinh câu lệnh SQL
+                sql_output = generate_create_table_sql(data, full_table_name)
+                st.subheader("Code SQL CREATE TABLE:")
+                st.code(sql_output, language="sql")
+
+                # Nút tải xuống file SQL
+                sql_file_name = f"{table_name}.sql"
+                st.download_button(
+                    label="Tải xuống file SQL",
+                    data=sql_output,
+                    file_name=sql_file_name,
+                    mime="text/sql",
+                )
+        except Exception as e:
+            st.error(f"Lỗi khi xử lý tệp: {e}")
+
 # Hàm suy luận kiểu dữ liệu
 def infer_data_type(sample_value, column_name):
     # Nếu tên cột chứa từ "ngay", suy luận kiểu DATE
