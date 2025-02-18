@@ -1,3 +1,4 @@
+mô tả code app sau:
 import streamlit as st
 import pandas as pd
 import unicodedata
@@ -74,8 +75,9 @@ def infer_data_type(sample_value, column_name):
 
 
 # Hàm tạo Code CREATE TABLE từ dữ liệu nhập
-def generate_create_table_sql(data, full_table_name):
-    sql = f"CREATE TABLE {full_table_name} (\n"
+def generate_create_table_sql(data, table_name):
+    table_name = normalize_column_name(table_name)
+    sql = f"CREATE TABLE {table_name} (\n"
     sql += "    id SERIAL PRIMARY KEY,\n"
 
     for row in data:
@@ -89,26 +91,12 @@ def generate_create_table_sql(data, full_table_name):
 # Giao diện Streamlit
 st.title("Tạo Code SQL CREATE TABLE")
 
-# Nhập tên schema (không bắt buộc)
-schema_name = st.text_input("Nhập tên schema (tùy chọn, mặc định là 'public')", placeholder="Ví dụ: subpublic")
-
-# Nếu không nhập, sử dụng schema mặc định
-if not schema_name.strip():
-    schema_name = "public"
-
 # Nhập tên bảng (không bắt buộc)
 table_name = st.text_input("Nhập tên bảng (tùy chọn, mặc định là 'table_name')", placeholder="Ví dụ: my_table")
 
 # Nếu không nhập, sử dụng tên bảng mặc định
 if not table_name.strip():
     table_name = "table_name"
-
-# Chuẩn hóa tên schema và tên bảng
-schema_name = normalize_column_name(schema_name)
-table_name = normalize_column_name(table_name)
-
-# Tên bảng đầy đủ với schema
-full_table_name = f"{schema_name}.{table_name}"
 
 # Tab điều hướng
 tab1, tab2 = st.tabs(["Nhập dữ liệu trực tiếp", "Đính kèm tệp"])
@@ -150,7 +138,7 @@ with tab1:
                             for col_name, sample_value in zip(column_names, sample_values)]
 
                     # Sinh câu lệnh SQL
-                    sql_output = generate_create_table_sql(data, full_table_name)
+                    sql_output = generate_create_table_sql(data, table_name)
                     st.subheader("Câu lệnh CREATE TABLE:")
                     st.code(sql_output, language="sql")
 
@@ -212,7 +200,7 @@ with tab2:
                 data = df.to_dict(orient="records")
 
                 # Sinh câu lệnh SQL
-                sql_output = generate_create_table_sql(data, full_table_name)
+                sql_output = generate_create_table_sql(data, table_name)
                 st.subheader("Code SQL CREATE TABLE:")
                 st.code(sql_output, language="sql")
 
