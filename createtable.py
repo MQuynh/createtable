@@ -161,15 +161,15 @@ Nhập danh sách **tên cột** và **giá trị mẫu** tương ứng theo cá
 **Ví dụ:**
 - Ô "Tên cột":
     ```
-    Họ và tên
-    Ngày sinh
-    Điểm trung bình
+    Ngân hàng
+    Ngày giao dịch
+    Số tiền
     ```
 - Ô "Giá trị mẫu":
     ```
-    Nguyễn Văn A
-    01/01/2000
-    8.5
+    ACB
+    01/01/2025
+    1000000000
     ```
 
 ---
@@ -182,7 +182,7 @@ Tải lên tệp Excel (.xlsx) hoặc CSV (.csv) với cấu trúc:
 **Ví dụ:**
 | Tên cột         | Giá trị mẫu   |
 |------------------|---------------|
-| Họ và tên       | Nguyễn Văn A  |
-| Ngày sinh       | 01/01/2000    |
-| Điểm trung bình | 8.5           |
+| Ngân hàng       | Ngày giao dịch  |
+| Ngày giao dịch  | 01/01/2025    |
+| Số tiền         |  1000000000           |
 """)
