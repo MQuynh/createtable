@@ -35,13 +35,6 @@ def infer_data_type(sample_value, column_name):
     # Kiểm tra nếu giá trị mẫu là chuỗi "INT"
     if isinstance(sample_value, str) and sample_value.strip().upper() == "INT":
         return "INTEGER"
-    
-    # Kiểm tra nếu là số nguyên
-    try:
-        int(sample_value)
-        return "INTEGER"
-    except ValueError:
-        pass
 
     # Kiểm tra nếu là số thực
     try:
