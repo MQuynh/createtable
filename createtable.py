@@ -102,35 +102,24 @@ tab1, tab2 = st.tabs(["Nhập dữ liệu trực tiếp", "Đính kèm tệp"])
 # Tab 1: Nhập dữ liệu trực tiếp
 with tab1:
     # Khu vực nhập liệu
-    st.write("### Nhập dữ liệu:")
-    
-    # Hai ô nhập liệu: Tên cột và Giá trị mẫu
-    column_names_input = st.text_area(
-        "Tên cột (mỗi dòng một cột)",
-        height=200,
-        placeholder="Nhập danh sách tên cột",
-    )
-    sample_values_input = st.text_area(
-        "Giá trị mẫu (mỗi dòng một giá trị)",
-        height=200,
-        placeholder="Nhập danh sách giá trị mẫu",
-    )
+    col1, col2 = st.columns(2)
+    with col1:
+        column_names_input = st.text_area("Tên cột", height=200, placeholder="Nhập danh sách tên cột, mỗi dòng một cột")
+    with col2:
+        sample_values_input = st.text_area("Giá trị mẫu", height=200, placeholder="Nhập danh sách giá trị mẫu, mỗi dòng một giá trị")
 
-    # Chuyển dữ liệu nhập thành danh sách
+    # Hiển thị dữ liệu đã nhập (ngay cả khi không hợp lệ)
     column_names = column_names_input.strip().split("\n") if column_names_input.strip() else []
     sample_values = sample_values_input.strip().split("\n") if sample_values_input.strip() else []
 
     # Tạo bảng hiển thị dữ liệu đã nhập
-    max_rows = max(len(column_names), len(sample_values))  # Xác định số dòng lớn nhất
     data_preview = {
-        "STT": list(range(1, max_rows + 1)),  # Số thứ tự tự động
-        "Tên cột": column_names + [""] * (max_rows - len(column_names)),  # Điền giá trị trống nếu thiếu
-        "Giá trị mẫu": sample_values + [""] * (max_rows - len(sample_values)),  # Điền giá trị trống nếu thiếu
+        "STT": list(range(1, max(len(column_names), len(sample_values)) + 1)),
+        "Tên cột": column_names + [""] * (max(len(column_names), len(sample_values)) - len(column_names)),
+        "Giá trị mẫu": sample_values + [""] * (max(len(column_names), len(sample_values)) - len(sample_values)),
     }
-
-    # Hiển thị bảng dữ liệu
     st.write("### Dữ liệu đã nhập:")
-    st.dataframe(pd.DataFrame(data_preview))  # Hiển thị bảng với chế độ cuộn
+    st.table(pd.DataFrame(data_preview))
 
     # Kiểm tra tính hợp lệ của dữ liệu
     if len(column_names) != len(sample_values):
@@ -184,8 +173,6 @@ with tab1:
         8000
         ```
     """)
-
-
 
 
 # Tab 2: Đính kèm tệp
