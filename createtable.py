@@ -4,6 +4,9 @@ import unicodedata
 import re
 import datetime
 
+# Hiển thị logo ở đầu giao diện
+st.image("logo.png", use_column_width=False, width=150)  # width: điều chỉnh kích thước logo
+
 # Hàm chuẩn hóa tên cột
 def normalize_column_name(column_name):
     column_name = column_name.replace('đ', 'd').replace('Đ', 'd')
