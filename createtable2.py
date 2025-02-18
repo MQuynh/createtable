@@ -68,15 +68,6 @@ def infer_data_type(sample_value, column_name):
     if isinstance(sample_value, str) and is_date_format(sample_value):
         return "DATE"
 
-    # **Kiểm tra nếu không chứa bất kỳ chữ cái nào trong bảng chữ cái**
-    if isinstance(sample_value, str) and not re.search(r'[a-zA-Z]', sample_value):
-        try:
-            # Nếu có thể chuyển đổi thành số thực, suy luận là DOUBLE PRECISION
-            float(sample_value.replace(",", "").replace(".", ""))
-            return "DOUBLE PRECISION"
-        except ValueError:
-            pass
-
     # Nếu không khớp bất kỳ điều kiện nào, mặc định là TEXT
     return "TEXT"
 
