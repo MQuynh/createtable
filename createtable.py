@@ -122,7 +122,6 @@ with tab1:
             }
             st.write("### Dữ liệu đã nhập:")
             st.dataframe(pd.DataFrame(data_preview))
-            st.dataframe(pd.DataFrame(data_preview).reset_index(drop=True))
 
     # Xử lý dữ liệu khi người dùng nhấn nút
     if st.button("Tạo câu lệnh SQL từ dữ liệu nhập"):
