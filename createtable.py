@@ -5,7 +5,7 @@ import re
 import datetime
 
 # Hiển thị logo ở đầu giao diện
-st.image("logo.png", use_container_width=False, width=5)  # width: điều chỉnh kích thước logo
+st.image("logo.png", use_container_width=False, width=50)  # width: điều chỉnh kích thước logo
 
 # Hàm chuẩn hóa tên cột
 def normalize_column_name(column_name):
