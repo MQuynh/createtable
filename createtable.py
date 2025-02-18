@@ -26,26 +26,21 @@ def is_date_format(value):
                 return True
     return False
 
-# Hàm kiểm tra xem giá trị có phải là số nguyên không
-def is_integer(value):
-    try:
-        return float(value).is_integer()
-    except ValueError:
-        return False
-
 # Hàm suy luận kiểu dữ liệu
 def infer_data_type(sample_value, column_name):
-    sample_value = str(sample_value).strip()  # Chuyển giá trị về chuỗi để xử lý
-    if "ngay" in column_name.lower() or is_date_format(sample_value):
+    if "ngay" in column_name.lower():
         return "DATE"
-    elif is_integer(sample_value):
+    if isinstance(sample_value, str) and sample_value.strip().upper() == "INT":
         return "INTEGER"
-    try:
-        # Kiểm tra nếu là số thực (DOUBLE PRECISION)
-        float(sample_value)
+    elif sample_value == "":
+        return "TEXT"
+    elif isinstance(sample_value, str) and is_date_format(sample_value):
+        return "DATE"
+    elif isinstance(sample_value, (int, float)):
         return "DOUBLE PRECISION"
-    except ValueError:
-        # Nếu không phải số, trả về TEXT
+    elif isinstance(sample_value, str):
+        return "TEXT"
+    else:
         return "TEXT"
 
 # Hàm tạo câu lệnh CREATE TABLE từ dữ liệu nhập
