@@ -120,13 +120,8 @@ with tab1:
                 "Tên cột": column_names,
                 "Giá trị mẫu": sample_values,
             }
-
-            # Chuyển đổi thành DataFrame và xóa cột chỉ mục
-            df = pd.DataFrame(data_preview).reset_index(drop=True)
-
-            # Hiển thị bảng không có cột chỉ mục
             st.write("### Dữ liệu đã nhập:")
-            st.table(df)
+            st.table(pd.DataFrame(data_preview))
 
     # Xử lý dữ liệu khi người dùng nhấn nút
     if st.button("Tạo câu lệnh SQL từ dữ liệu nhập"):
