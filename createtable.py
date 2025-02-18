@@ -105,38 +105,29 @@ with tab1:
     with col2:
         sample_values_input = st.text_area("Giá trị mẫu", height=200, placeholder="Nhập danh sách giá trị mẫu, mỗi dòng một giá trị")
 
-    # Hiển thị số thứ tự khi người dùng nhập liệu
-    if column_names_input.strip() and sample_values_input.strip():
-        column_names = column_names_input.strip().split("\n")
-        sample_values = sample_values_input.strip().split("\n")
+    # Hiển thị dữ liệu đã nhập (ngay cả khi không hợp lệ)
+    column_names = column_names_input.strip().split("\n") if column_names_input.strip() else []
+    sample_values = sample_values_input.strip().split("\n") if sample_values_input.strip() else []
 
-        # Kiểm tra số lượng dòng
-        if len(column_names) != len(sample_values):
-            st.error("Số lượng dòng giữa 'Tên cột' và 'Giá trị mẫu' không khớp!")
-        else:
-            # Tạo bảng hiển thị số thứ tự, tên cột và giá trị mẫu
-            data_preview = {
-                "STT": list(range(1, len(column_names) + 1)),
-                "Tên cột": column_names,
-                "Giá trị mẫu": sample_values,
-            }
-            st.write("### Dữ liệu đã nhập:")
-            st.table(pd.DataFrame(data_preview))
+    # Tạo bảng hiển thị dữ liệu đã nhập
+    data_preview = {
+        "STT": list(range(1, max(len(column_names), len(sample_values)) + 1)),
+        "Tên cột": column_names + [""] * (max(len(column_names), len(sample_values)) - len(column_names)),
+        "Giá trị mẫu": sample_values + [""] * (max(len(column_names), len(sample_values)) - len(sample_values)),
+    }
+    st.write("### Dữ liệu đã nhập:")
+    st.table(pd.DataFrame(data_preview))
 
-    # Xử lý dữ liệu khi người dùng nhấn nút
-    if st.button("Tạo code SQL từ dữ liệu nhập"):
-        if not column_names_input.strip() or not sample_values_input.strip():
-            st.error("Vui lòng nhập đầy đủ cả danh sách tên cột và giá trị mẫu!")
-        else:
-            try:
-                # Chuyển dữ liệu từ text area thành danh sách
-                column_names = column_names_input.strip().split("\n")
-                sample_values = sample_values_input.strip().split("\n")
-
-                # Kiểm tra số lượng dòng
-                if len(column_names) != len(sample_values):
-                    st.error("Số lượng dòng giữa 'Tên cột' và 'Giá trị mẫu' không khớp!")
-                else:
+    # Kiểm tra tính hợp lệ của dữ liệu
+    if len(column_names) != len(sample_values):
+        st.error("Số lượng dòng giữa 'Tên cột' và 'Giá trị mẫu' không khớp!")
+    else:
+        # Xử lý dữ liệu khi người dùng nhấn nút
+        if st.button("Tạo code SQL từ dữ liệu nhập"):
+            if not column_names_input.strip() or not sample_values_input.strip():
+                st.error("Vui lòng nhập đầy đủ cả danh sách tên cột và giá trị mẫu!")
+            else:
+                try:
                     # Tạo danh sách dữ liệu
                     data = [{"Tên cột": col_name.strip(), "Giá trị mẫu": sample_value.strip()} 
                             for col_name, sample_value in zip(column_names, sample_values)]
@@ -154,8 +145,8 @@ with tab1:
                         file_name=sql_file_name,
                         mime="text/sql",
                     )
-            except Exception as e:
-                st.error(f"Lỗi: {e}")
+                except Exception as e:
+                    st.error(f"Lỗi: {e}")
 
     # Hướng dẫn nhập liệu (chỉ trong tab nhập liệu trực tiếp)
     st.markdown("---")
