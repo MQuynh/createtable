@@ -33,6 +33,44 @@ def is_date_format(value):
                 return True
     return False
 
+# Hàm suy luận kiểu dữ liệu
+def infer_data_type(sample_value, column_name):
+    # Nếu tên cột chứa từ "ngay", suy luận kiểu DATE
+    if "ngay" in column_name.lower():
+        return "DATE"
+    
+    # Kiểm tra nếu giá trị mẫu là chuỗi "INT"
+    if isinstance(sample_value, str) and sample_value.strip().upper() == "INT":
+        return "INTEGER"
+    
+    # Kiểm tra nếu giá trị mẫu là kiểu datetime
+    if isinstance(sample_value, pd.Timestamp) or isinstance(sample_value, datetime.datetime):
+        return "DATE"
+    
+    # Loại bỏ các ký tự phân cách hàng nghìn (.,) và kiểm tra kiểu số
+    if isinstance(sample_value, str):
+        normalized_value = sample_value.replace(",", "").replace(".", "")
+        try:
+            # Kiểm tra nếu là số nguyên
+            int(normalized_value)
+            return "DOUBLE PRECISION"
+        except ValueError:
+            pass
+
+        try:
+            # Kiểm tra nếu là số thực
+            float(normalized_value)
+            return "DOUBLE PRECISION"
+        except ValueError:
+            pass
+
+    # Kiểm tra nếu là ngày tháng dưới dạng chuỗi
+    if isinstance(sample_value, str) and is_date_format(sample_value):
+        return "DATE"
+
+    # Nếu không khớp bất kỳ điều kiện nào, mặc định là TEXT
+    return "TEXT"
+
 # Hàm chuẩn hóa và xử lý dữ liệu sau khi tải lên tệp
 def process_uploaded_file(df):
     # Chuẩn hóa lại dữ liệu từ file Excel
@@ -92,12 +130,6 @@ with tab2:
                 )
         except Exception as e:
             st.error(f"Lỗi khi xử lý tệp: {e}")
-
-
-      mat(sample_value):
-        return "DATE"
-
-
 
 
 # Hàm tạo Code CREATE TABLE từ dữ liệu nhập
