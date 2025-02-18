@@ -69,7 +69,7 @@ def infer_data_type(sample_value, column_name):
 
 
 
-# Hàm tạo câu lệnh CREATE TABLE từ dữ liệu nhập
+# Hàm tạo Code CREATE TABLE từ dữ liệu nhập
 def generate_create_table_sql(data, table_name):
     table_name = normalize_column_name(table_name)
     sql = f"CREATE TABLE {table_name} (\n"
@@ -84,7 +84,7 @@ def generate_create_table_sql(data, table_name):
     return sql
 
 # Giao diện Streamlit
-st.title("Tạo câu lệnh SQL CREATE TABLE")
+st.title("Tạo Code SQL CREATE TABLE")
 
 # Nhập tên bảng (không bắt buộc)
 table_name = st.text_input("Nhập tên bảng (tùy chọn, mặc định là 'table_name')", placeholder="Ví dụ: my_table")
