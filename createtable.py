@@ -124,15 +124,15 @@ with tab1:
     **Ví dụ:**
     - Ô "Tên cột":
         ```
-        Họ và tên
-        Ngày sinh
-        Điểm trung bình
+        Ngân hàng
+        Ngày giao dịch
+        Số tiền
         ```
     - Ô "Giá trị mẫu":
         ```
-        Nguyễn Văn A
-        01/01/2000
-        8.5
+        ACB
+        01/01/2025
+        1000000
         ```
     """)
 
@@ -184,7 +184,7 @@ with tab2:
     **Ví dụ:**
     | Tên cột         | Giá trị mẫu   |
     |------------------|---------------|
-    | Họ và tên       | Nguyễn Văn A  |
-    | Ngày sinh       | 01/01/2000    |
-    | Điểm trung bình | 8.5           |
+    | Ngân hàng       | ACB  |
+    | Ngày giao dịch       | 01/01/2025    |
+    | Số tiền | 1000000           |
     """)
