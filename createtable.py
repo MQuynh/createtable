@@ -113,45 +113,8 @@ with tab1:
             except Exception as e:
                 st.error(f"Lỗi: {e}")
 
-    # Hướng dẫn nhập liệu (đưa xuống cuối)
-    st.markdown("---")
-    st.write("""
-    ### Hướng dẫn nhập liệu
-    Nhập danh sách **tên cột** và **giá trị mẫu** tương ứng theo cách song song:
-    - Mỗi dòng của ô "Tên cột" tương ứng với một dòng của ô "Giá trị mẫu".
-    - Số lượng dòng trong hai ô phải bằng nhau.
-
-    **Ví dụ:**
-    - Ô "Tên cột":
-        ```
-        Họ và tên
-        Ngày sinh
-        Điểm trung bình
-        ```
-    - Ô "Giá trị mẫu":
-        ```
-        Nguyễn Văn A
-        01/01/2000
-        8.5
-        ```
-    """)
-
 # Tab 2: Đính kèm tệp
 with tab2:
-    st.write("""
-    ### Hướng dẫn đính kèm tệp:
-    Tải lên tệp Excel (.xlsx) hoặc CSV (.csv) với cấu trúc:
-    - **Cột 1**: Tên cột.
-    - **Cột 2**: Giá trị mẫu.
-
-    **Ví dụ:**
-    | Tên cột         | Giá trị mẫu   |
-    |------------------|---------------|
-    | Họ và tên       | Nguyễn Văn A  |
-    | Ngày sinh       | 01/01/2000    |
-    | Điểm trung bình | 8.5           |
-    """)
-
     # Khu vực tải lên tệp
     uploaded_file = st.file_uploader("Tải lên tệp Excel hoặc CSV", type=["xlsx", "csv"])
 
@@ -186,3 +149,40 @@ with tab2:
                 )
         except Exception as e:
             st.error(f"Lỗi khi xử lý tệp: {e}")
+
+# Hướng dẫn (đưa xuống cuối)
+st.markdown("---")
+st.write("""
+### Hướng dẫn nhập liệu
+Nhập danh sách **tên cột** và **giá trị mẫu** tương ứng theo cách song song:
+- Mỗi dòng của ô "Tên cột" tương ứng với một dòng của ô "Giá trị mẫu".
+- Số lượng dòng trong hai ô phải bằng nhau.
+
+**Ví dụ:**
+- Ô "Tên cột":
+    ```
+    Họ và tên
+    Ngày sinh
+    Điểm trung bình
+    ```
+- Ô "Giá trị mẫu":
+    ```
+    Nguyễn Văn A
+    01/01/2000
+    8.5
+    ```
+
+---
+
+### Hướng dẫn đính kèm tệp
+Tải lên tệp Excel (.xlsx) hoặc CSV (.csv) với cấu trúc:
+- **Cột 1**: Tên cột.
+- **Cột 2**: Giá trị mẫu.
+
+**Ví dụ:**
+| Tên cột         | Giá trị mẫu   |
+|------------------|---------------|
+| Họ và tên       | Nguyễn Văn A  |
+| Ngày sinh       | 01/01/2000    |
+| Điểm trung bình | 8.5           |
+""")
