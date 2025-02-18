@@ -74,51 +74,63 @@ tab1, tab2 = st.tabs(["Nhập dữ liệu trực tiếp", "Đính kèm tệp"])
 with tab1:
     st.write("""
     ### Hướng dẫn nhập liệu:
-    Nhập dữ liệu hàng loạt với định dạng sau:
-    - Mỗi dòng tương ứng với một cột.
-    - Mỗi dòng gồm **Tên cột** và **Giá trị mẫu**, cách nhau bởi dấu phẩy (,).
+    Nhập danh sách **tên cột** và **giá trị mẫu** tương ứng theo cách song song:
+    - Mỗi dòng của ô "Tên cột" tương ứng với một dòng của ô "Giá trị mẫu".
+    - Số lượng dòng trong hai ô phải bằng nhau.
 
     **Ví dụ:**
-    ```
-    Tên cột 1, Giá trị mẫu 1
-    Tên cột 2, Giá trị mẫu 2
-    Tên cột 3, Giá trị mẫu 3
-    ```
+    - Ô "Tên cột":
+        ```
+        Họ và tên
+        Ngày sinh
+        Điểm trung bình
+        ```
+    - Ô "Giá trị mẫu":
+        ```
+        Nguyễn Văn A
+        01/01/2000
+        8.5
+        ```
     """)
 
     # Khu vực nhập liệu
-    bulk_input = st.text_area("Nhập dữ liệu hàng loạt", height=200, placeholder="Tên cột 1, Giá trị mẫu 1\nTên cột 2, Giá trị mẫu 2")
+    col1, col2 = st.columns(2)
+    with col1:
+        column_names_input = st.text_area("Tên cột", height=200, placeholder="Nhập danh sách tên cột, mỗi dòng một cột")
+    with col2:
+        sample_values_input = st.text_area("Giá trị mẫu", height=200, placeholder="Nhập danh sách giá trị mẫu, mỗi dòng một giá trị")
 
     # Xử lý dữ liệu khi người dùng nhấn nút
     if st.button("Tạo câu lệnh SQL từ dữ liệu nhập"):
-        if not bulk_input.strip():
-            st.error("Vui lòng nhập dữ liệu!")
+        if not column_names_input.strip() or not sample_values_input.strip():
+            st.error("Vui lòng nhập đầy đủ cả danh sách tên cột và giá trị mẫu!")
         else:
             try:
-                # Chuyển dữ liệu từ text area thành danh sách các cột
-                rows = bulk_input.strip().split("\n")
-                data = []
-                for row in rows:
-                    parts = row.split(",", 1)  # Tách thành 2 phần: Tên cột và Giá trị mẫu
-                    if len(parts) != 2:
-                        raise ValueError(f"Dòng không hợp lệ: {row}")
-                    col_name = parts[0].strip()
-                    sample_value = parts[1].strip()
-                    data.append({"Tên cột": col_name, "Giá trị mẫu": sample_value})
+                # Chuyển dữ liệu từ text area thành danh sách
+                column_names = column_names_input.strip().split("\n")
+                sample_values = sample_values_input.strip().split("\n")
 
-                # Sinh câu lệnh SQL
-                sql_output = generate_create_table_sql(data, table_name)
-                st.subheader("Câu lệnh CREATE TABLE:")
-                st.code(sql_output, language="sql")
+                # Kiểm tra số lượng dòng
+                if len(column_names) != len(sample_values):
+                    st.error("Số lượng dòng giữa 'Tên cột' và 'Giá trị mẫu' không khớp!")
+                else:
+                    # Tạo danh sách dữ liệu
+                    data = [{"Tên cột": col_name.strip(), "Giá trị mẫu": sample_value.strip()} 
+                            for col_name, sample_value in zip(column_names, sample_values)]
 
-                # Nút tải xuống file SQL
-                sql_file_name = f"{table_name}.sql"
-                st.download_button(
-                    label="Tải xuống file SQL",
-                    data=sql_output,
-                    file_name=sql_file_name,
-                    mime="text/sql",
-                )
+                    # Sinh câu lệnh SQL
+                    sql_output = generate_create_table_sql(data, table_name)
+                    st.subheader("Câu lệnh CREATE TABLE:")
+                    st.code(sql_output, language="sql")
+
+                    # Nút tải xuống file SQL
+                    sql_file_name = f"{table_name}.sql"
+                    st.download_button(
+                        label="Tải xuống file SQL",
+                        data=sql_output,
+                        file_name=sql_file_name,
+                        mime="text/sql",
+                    )
             except Exception as e:
                 st.error(f"Lỗi: {e}")
 
@@ -131,11 +143,11 @@ with tab2:
     - **Cột 2**: Giá trị mẫu.
 
     **Ví dụ:**
-    | Tên cột       | Giá trị mẫu   |
-    |---------------|---------------|
-    | Họ và tên     | Nguyễn Văn A  |
-    | Ngày sinh     | 01/01/2000    |
-    | Điểm trung bình | 8.5         |
+    | Tên cột         | Giá trị mẫu   |
+    |------------------|---------------|
+    | Họ và tên       | Nguyễn Văn A  |
+    | Ngày sinh       | 01/01/2000    |
+    | Điểm trung bình | 8.5           |
     """)
 
     # Khu vực tải lên tệp
