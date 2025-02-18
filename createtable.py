@@ -42,7 +42,15 @@ def infer_data_type(sample_value, column_name):
 
 def generate_create_table_sql(file):
     table_name = "uploaded_table"
-    df = pd.read_excel(file, sheet_name=0)
+
+    # Xác định định dạng file và đọc dữ liệu
+    if file.name.endswith('.xlsx'):
+        df = pd.read_excel(file, sheet_name=0)
+    elif file.name.endswith('.csv'):
+        df = pd.read_csv(file)
+    else:
+        raise ValueError("Định dạng file không được hỗ trợ. Vui lòng tải lên file Excel (.xlsx) hoặc CSV (.csv).")
+
     required_columns = ["Tên cột", "Giá trị mẫu"]
     for col in required_columns:
         if col not in df.columns:
@@ -62,15 +70,15 @@ def generate_create_table_sql(file):
     return sql
 
 # Giao diện Streamlit
-st.title("Tạo câu lệnh CREATE TABLE từ file Excel")
+st.title("Tạo câu lệnh CREATE TABLE từ file Excel hoặc CSV")
 st.write(
     """
-    Ứng dụng này cho phép bạn tải lên file Excel chứa thông tin cột và giá trị mẫu,
+    Ứng dụng này cho phép bạn tải lên file Excel (.xlsx) hoặc CSV (.csv) chứa thông tin cột và giá trị mẫu,
     sau đó tự động tạo câu lệnh SQL để tạo bảng.
     """
 )
 
-uploaded_file = st.file_uploader("Tải lên file Excel", type=["xlsx"])
+uploaded_file = st.file_uploader("Tải lên file Excel hoặc CSV", type=["xlsx", "csv"])
 
 if uploaded_file is not None:
     try:
