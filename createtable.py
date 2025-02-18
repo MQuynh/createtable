@@ -103,50 +103,34 @@ tab1, tab2 = st.tabs(["Nhập dữ liệu trực tiếp", "Đính kèm tệp"])
 with tab1:
     # Khu vực nhập liệu
     st.write("### Nhập dữ liệu:")
-    col1, col2, col3 = st.columns([0.2, 1, 1])  # Chia layout thành 3 cột: STT, Tên cột, Giá trị mẫu
+    
+    # Hai ô nhập liệu: Tên cột và Giá trị mẫu
+    column_names_input = st.text_area(
+        "Tên cột (mỗi dòng một cột)",
+        height=200,
+        placeholder="Nhập danh sách tên cột",
+    )
+    sample_values_input = st.text_area(
+        "Giá trị mẫu (mỗi dòng một giá trị)",
+        height=200,
+        placeholder="Nhập danh sách giá trị mẫu",
+    )
 
-    with col1:
-        st.markdown("**STT**")  # Tiêu đề cho cột STT
-        # Tạo danh sách STT dựa trên số dòng lớn nhất của hai ô nhập liệu
-        max_rows = max(len(st.session_state.get("column_names", [])), len(st.session_state.get("sample_values", [])))
-        stt_list = list(range(1, max_rows + 1))  # Danh sách STT
-
-        # Hiển thị STT
-        for stt in stt_list:
-            st.text(f"{stt}")
-
-    with col2:
-        st.markdown("**Tên cột**")  # Tiêu đề cho ô tên cột
-        # Lưu trạng thái tên cột
-        column_names_input = st.text_area(
-            "Nhập danh sách tên cột",
-            height=200,
-            placeholder="Nhập danh sách tên cột, mỗi dòng một cột",
-            key="column_names"
-        )
-
-    with col3:
-        st.markdown("**Giá trị mẫu**")  # Tiêu đề cho ô giá trị mẫu
-        # Lưu trạng thái giá trị mẫu
-        sample_values_input = st.text_area(
-            "Nhập danh sách giá trị mẫu",
-            height=200,
-            placeholder="Nhập danh sách giá trị mẫu, mỗi dòng một giá trị",
-            key="sample_values"
-        )
-
-    # Hiển thị dữ liệu đã nhập (ngay cả khi không hợp lệ)
+    # Chuyển dữ liệu nhập thành danh sách
     column_names = column_names_input.strip().split("\n") if column_names_input.strip() else []
     sample_values = sample_values_input.strip().split("\n") if sample_values_input.strip() else []
 
     # Tạo bảng hiển thị dữ liệu đã nhập
+    max_rows = max(len(column_names), len(sample_values))  # Xác định số dòng lớn nhất
     data_preview = {
-        "STT": list(range(1, max(len(column_names), len(sample_values)) + 1)),
-        "Tên cột": column_names + [""] * (max(len(column_names), len(sample_values)) - len(column_names)),
-        "Giá trị mẫu": sample_values + [""] * (max(len(column_names), len(sample_values)) - len(sample_values)),
+        "STT": list(range(1, max_rows + 1)),  # Số thứ tự tự động
+        "Tên cột": column_names + [""] * (max_rows - len(column_names)),  # Điền giá trị trống nếu thiếu
+        "Giá trị mẫu": sample_values + [""] * (max_rows - len(sample_values)),  # Điền giá trị trống nếu thiếu
     }
+
+    # Hiển thị bảng dữ liệu
     st.write("### Dữ liệu đã nhập:")
-    st.table(pd.DataFrame(data_preview))
+    st.dataframe(pd.DataFrame(data_preview))  # Hiển thị bảng với chế độ cuộn
 
     # Kiểm tra tính hợp lệ của dữ liệu
     if len(column_names) != len(sample_values):
@@ -200,6 +184,7 @@ with tab1:
         8000
         ```
     """)
+
 
 
 
