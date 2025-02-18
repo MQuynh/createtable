@@ -124,7 +124,7 @@ with tab1:
             st.table(pd.DataFrame(data_preview))
 
     # Xử lý dữ liệu khi người dùng nhấn nút
-    if st.button("Tạo câu lệnh SQL từ dữ liệu nhập"):
+    if st.button("Tạo code SQL từ dữ liệu nhập"):
         if not column_names_input.strip() or not sample_values_input.strip():
             st.error("Vui lòng nhập đầy đủ cả danh sách tên cột và giá trị mẫu!")
         else:
@@ -204,7 +204,7 @@ with tab2:
 
                 # Sinh câu lệnh SQL
                 sql_output = generate_create_table_sql(data, table_name)
-                st.subheader("Câu lệnh CREATE TABLE:")
+                st.subheader("Code SQL CREATE TABLE:")
                 st.code(sql_output, language="sql")
 
                 # Nút tải xuống file SQL
