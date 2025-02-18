@@ -24,7 +24,7 @@ def is_date_format(value):
         date_patterns = [
             r'^\d{2}/\d{2}/\d{4}$',          # dd/mm/yyyy
             r'^\d{2}-\d{2}-\d{4}$',          # dd-mm-yyyy
-            r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$'  # yyyy-mm-dd hh:mm:ss
+            r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$',  # yyyy-mm-dd hh:mm:ss
             r'^\d{2}/\d{2}/\d{2}$',          # dd/mm/yy
             r'^\d{2}-\d{2}-\d{2}$'           # dd-mm-yy
         ]
@@ -51,14 +51,14 @@ def infer_data_type(sample_value, column_name):
     if isinstance(sample_value, str):
         normalized_value = sample_value.replace(",", "").replace(".", "")
         try:
-            # Kiểm tra nếu là số nguyên
+            # Kiểm tra nếu là số nguyên (integer)
             int(normalized_value)
-            return "DOUBLE PRECISION"
+            return "INTEGER"
         except ValueError:
             pass
 
         try:
-            # Kiểm tra nếu là số thực
+            # Kiểm tra nếu là số thực (floating point)
             float(normalized_value)
             return "DOUBLE PRECISION"
         except ValueError:
@@ -91,46 +91,6 @@ def process_uploaded_file(df):
     
     # Đảm bảo các cột có kiểu dữ liệu phù hợp sau khi xử lý
     return df
-
-# Hàm xử lý khi tệp Excel được tải lên
-with tab2:
-    uploaded_file = st.file_uploader("Tải lên tệp Excel hoặc CSV", type=["xlsx", "csv"])
-
-    if uploaded_file is not None:
-        try:
-            # Đọc dữ liệu từ tệp
-            if uploaded_file.name.endswith(".csv"):
-                df = pd.read_csv(uploaded_file)
-            else:
-                df = pd.read_excel(uploaded_file)
-
-            # Kiểm tra định dạng tệp
-            if df.shape[1] < 2:
-                st.error("Tệp phải có ít nhất 2 cột: 'Tên cột' và 'Giá trị mẫu'.")
-            else:
-                # Chuẩn hóa và xử lý dữ liệu
-                df.columns = ["Tên cột", "Giá trị mẫu"]
-                df = process_uploaded_file(df)  # Chạy hàm chuẩn hóa dữ liệu
-
-                # Tạo dữ liệu từ dataframe đã chuẩn hóa
-                data = df.to_dict(orient="records")
-
-                # Sinh câu lệnh SQL
-                sql_output = generate_create_table_sql(data, full_table_name)
-                st.subheader("Code SQL CREATE TABLE:")
-                st.code(sql_output, language="sql")
-
-                # Nút tải xuống file SQL
-                sql_file_name = f"{table_name}.sql"
-                st.download_button(
-                    label="Tải xuống file SQL",
-                    data=sql_output,
-                    file_name=sql_file_name,
-                    mime="text/sql",
-                )
-        except Exception as e:
-            st.error(f"Lỗi khi xử lý tệp: {e}")
-
 
 # Hàm tạo Code CREATE TABLE từ dữ liệu nhập
 def generate_create_table_sql(data, full_table_name):
@@ -172,83 +132,6 @@ full_table_name = f"{schema_name}.{table_name}"
 # Tab điều hướng
 tab1, tab2 = st.tabs(["Nhập dữ liệu trực tiếp", "Đính kèm tệp"])
 
-# Tab 1: Nhập dữ liệu trực tiếp
-with tab1:
-    # Khu vực nhập liệu
-    col1, col2 = st.columns(2)
-    with col1:
-        column_names_input = st.text_area("Tên cột", height=200, placeholder="Nhập danh sách tên cột, mỗi dòng một cột")
-    with col2:
-        sample_values_input = st.text_area("Giá trị mẫu", height=200, placeholder="Nhập danh sách giá trị mẫu, mỗi dòng một giá trị")
-
-    # Hiển thị dữ liệu đã nhập (ngay cả khi không hợp lệ)
-    column_names = column_names_input.strip().split("\n") if column_names_input.strip() else []
-    sample_values = sample_values_input.strip().split("\n") if sample_values_input.strip() else []
-
-    # Tạo bảng hiển thị dữ liệu đã nhập
-    data_preview = {
-        "STT": list(range(1, max(len(column_names), len(sample_values)) + 1)),
-        "Tên cột": column_names + [""] * (max(len(column_names), len(sample_values)) - len(column_names)),
-        "Giá trị mẫu": sample_values + [""] * (max(len(column_names), len(sample_values)) - len(sample_values)),
-    }
-    st.write("### Dữ liệu đã nhập:")
-    st.table(pd.DataFrame(data_preview))
-
-    # Kiểm tra tính hợp lệ của dữ liệu
-    if len(column_names) != len(sample_values):
-        st.error("Số lượng dòng giữa 'Tên cột' và 'Giá trị mẫu' không khớp!")
-    else:
-        # Xử lý dữ liệu khi người dùng nhấn nút
-        if st.button("Tạo code SQL từ dữ liệu nhập"):
-            if not column_names_input.strip() or not sample_values_input.strip():
-                st.error("Vui lòng nhập đầy đủ cả danh sách tên cột và giá trị mẫu!")
-            else:
-                try:
-                    # Tạo danh sách dữ liệu
-                    data = [{"Tên cột": col_name.strip(), "Giá trị mẫu": sample_value.strip()} 
-                            for col_name, sample_value in zip(column_names, sample_values)]
-
-                    # Sinh câu lệnh SQL
-                    sql_output = generate_create_table_sql(data, full_table_name)
-                    st.subheader("Câu lệnh CREATE TABLE:")
-                    st.code(sql_output, language="sql")
-
-                    # Nút tải xuống file SQL
-                    sql_file_name = f"{table_name}.sql"
-                    st.download_button(
-                        label="Tải xuống file SQL",
-                        data=sql_output,
-                        file_name=sql_file_name,
-                        mime="text/sql",
-                    )
-                except Exception as e:
-                    st.error(f"Lỗi: {e}")
-
-    # Hướng dẫn nhập liệu (chỉ trong tab nhập liệu trực tiếp)
-    st.markdown("---")
-    st.write("""
-    ### Hướng dẫn nhập liệu
-    Nhập danh sách **tên cột** và **giá trị mẫu** tương ứng theo cách song song:
-    - Mỗi dòng của ô "Tên cột" tương ứng với một dòng của ô "Giá trị mẫu".
-    - Số lượng dòng trong hai ô phải bằng nhau.
-    - Định dạng INTEGER giá trị mẫu điền chữ INT, mặc định số ở định dạng DOUBLE PRECISION
-
-    **Ví dụ:**
-    - Ô "Tên cột":
-        ```
-        Ngân hàng
-        Ngày giao dịch
-        Số tiền
-        ```
-    - Ô "Giá trị mẫu":
-        ```
-        ACB
-        01/01/2025
-        8000
-        ```
-    """)
-
-
 # Tab 2: Đính kèm tệp
 with tab2:
     # Khu vực tải lên tệp
@@ -266,8 +149,11 @@ with tab2:
             if df.shape[1] < 2:
                 st.error("Tệp phải có ít nhất 2 cột: 'Tên cột' và 'Giá trị mẫu'.")
             else:
-                # Đổi tên cột để đồng nhất
+                # Chuẩn hóa và xử lý dữ liệu
                 df.columns = ["Tên cột", "Giá trị mẫu"]
+                df = process_uploaded_file(df)  # Chạy hàm chuẩn hóa dữ liệu
+
+                # Tạo dữ liệu từ dataframe đã chuẩn hóa
                 data = df.to_dict(orient="records")
 
                 # Sinh câu lệnh SQL
