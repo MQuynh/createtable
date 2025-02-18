@@ -158,6 +158,7 @@ with tab1:
     Nhập danh sách **tên cột** và **giá trị mẫu** tương ứng theo cách song song:
     - Mỗi dòng của ô "Tên cột" tương ứng với một dòng của ô "Giá trị mẫu".
     - Số lượng dòng trong hai ô phải bằng nhau.
+    - Định dạng INTEGER giá trị mẫu điền chữ INT, mặc định số ở định dạng DOUBLE PRECISION
 
     **Ví dụ:**
     - Ô "Tên cột":
