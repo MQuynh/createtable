@@ -16,6 +16,7 @@ def normalize_column_name(column_name):
     column_name = re.sub(r'\W+', '_', column_name.strip().lower())
     return column_name
 
+
 # Hàm kiểm tra định dạng ngày
 def is_date_format(value):
     if isinstance(value, str):
@@ -46,7 +47,7 @@ def infer_data_type(sample_value, column_name):
     if isinstance(sample_value, pd.Timestamp) or isinstance(sample_value, datetime.datetime):
         return "DATE"
     
-    # Kiểm tra nếu là số nguyên
+     # Kiểm tra nếu là số nguyên
     try:
         int(sample_value)
         return "DOUBLE PRECISION"
@@ -60,6 +61,7 @@ def infer_data_type(sample_value, column_name):
     except (ValueError, TypeError):
         pass
 
+
     # Kiểm tra nếu là ngày tháng dưới dạng chuỗi
     if isinstance(sample_value, str) and is_date_format(sample_value):
         return "DATE"
@@ -70,9 +72,8 @@ def infer_data_type(sample_value, column_name):
 
 
 # Hàm tạo Code CREATE TABLE từ dữ liệu nhập
-def generate_create_table_sql(data, table_name):
-    table_name = normalize_column_name(table_name)
-    sql = f"CREATE TABLE {table_name} (\n"
+def generate_create_table_sql(data, full_table_name):
+    sql = f"CREATE TABLE {full_table_name} (\n"
     sql += "    id SERIAL PRIMARY KEY,\n"
 
     for row in data:
@@ -86,12 +87,26 @@ def generate_create_table_sql(data, table_name):
 # Giao diện Streamlit
 st.title("Tạo Code SQL CREATE TABLE")
 
+# Nhập tên schema (không bắt buộc)
+schema_name = st.text_input("Nhập tên schema (tùy chọn, mặc định là 'public')", placeholder="Ví dụ: subpublic")
+
+# Nếu không nhập, sử dụng schema mặc định
+if not schema_name.strip():
+    schema_name = "public"
+
 # Nhập tên bảng (không bắt buộc)
 table_name = st.text_input("Nhập tên bảng (tùy chọn, mặc định là 'table_name')", placeholder="Ví dụ: my_table")
 
 # Nếu không nhập, sử dụng tên bảng mặc định
 if not table_name.strip():
     table_name = "table_name"
+
+# Chuẩn hóa tên schema và tên bảng
+schema_name = normalize_column_name(schema_name)
+table_name = normalize_column_name(table_name)
+
+# Tên bảng đầy đủ với schema
+full_table_name = f"{schema_name}.{table_name}"
 
 # Tab điều hướng
 tab1, tab2 = st.tabs(["Nhập dữ liệu trực tiếp", "Đính kèm tệp"])
@@ -105,44 +120,35 @@ with tab1:
     with col2:
         sample_values_input = st.text_area("Giá trị mẫu", height=200, placeholder="Nhập danh sách giá trị mẫu, mỗi dòng một giá trị")
 
-    # Hiển thị số thứ tự khi người dùng nhập liệu
-    if column_names_input.strip() and sample_values_input.strip():
-        column_names = column_names_input.strip().split("\n")
-        sample_values = sample_values_input.strip().split("\n")
+    # Hiển thị dữ liệu đã nhập (ngay cả khi không hợp lệ)
+    column_names = column_names_input.strip().split("\n") if column_names_input.strip() else []
+    sample_values = sample_values_input.strip().split("\n") if sample_values_input.strip() else []
 
-        # Kiểm tra số lượng dòng
-        if len(column_names) != len(sample_values):
-            st.error("Số lượng dòng giữa 'Tên cột' và 'Giá trị mẫu' không khớp!")
-        else:
-            # Tạo bảng hiển thị số thứ tự, tên cột và giá trị mẫu
-            data_preview = {
-                "STT": list(range(1, len(column_names) + 1)),
-                "Tên cột": column_names,
-                "Giá trị mẫu": sample_values,
-            }
-            st.write("### Dữ liệu đã nhập:")
-            st.table(pd.DataFrame(data_preview))
+    # Tạo bảng hiển thị dữ liệu đã nhập
+    data_preview = {
+        "STT": list(range(1, max(len(column_names), len(sample_values)) + 1)),
+        "Tên cột": column_names + [""] * (max(len(column_names), len(sample_values)) - len(column_names)),
+        "Giá trị mẫu": sample_values + [""] * (max(len(column_names), len(sample_values)) - len(sample_values)),
+    }
+    st.write("### Dữ liệu đã nhập:")
+    st.table(pd.DataFrame(data_preview))
 
-    # Xử lý dữ liệu khi người dùng nhấn nút
-    if st.button("Tạo code SQL từ dữ liệu nhập"):
-        if not column_names_input.strip() or not sample_values_input.strip():
-            st.error("Vui lòng nhập đầy đủ cả danh sách tên cột và giá trị mẫu!")
-        else:
-            try:
-                # Chuyển dữ liệu từ text area thành danh sách
-                column_names = column_names_input.strip().split("\n")
-                sample_values = sample_values_input.strip().split("\n")
-
-                # Kiểm tra số lượng dòng
-                if len(column_names) != len(sample_values):
-                    st.error("Số lượng dòng giữa 'Tên cột' và 'Giá trị mẫu' không khớp!")
-                else:
+    # Kiểm tra tính hợp lệ của dữ liệu
+    if len(column_names) != len(sample_values):
+        st.error("Số lượng dòng giữa 'Tên cột' và 'Giá trị mẫu' không khớp!")
+    else:
+        # Xử lý dữ liệu khi người dùng nhấn nút
+        if st.button("Tạo code SQL từ dữ liệu nhập"):
+            if not column_names_input.strip() or not sample_values_input.strip():
+                st.error("Vui lòng nhập đầy đủ cả danh sách tên cột và giá trị mẫu!")
+            else:
+                try:
                     # Tạo danh sách dữ liệu
                     data = [{"Tên cột": col_name.strip(), "Giá trị mẫu": sample_value.strip()} 
                             for col_name, sample_value in zip(column_names, sample_values)]
 
                     # Sinh câu lệnh SQL
-                    sql_output = generate_create_table_sql(data, table_name)
+                    sql_output = generate_create_table_sql(data, full_table_name)
                     st.subheader("Câu lệnh CREATE TABLE:")
                     st.code(sql_output, language="sql")
 
@@ -154,8 +160,8 @@ with tab1:
                         file_name=sql_file_name,
                         mime="text/sql",
                     )
-            except Exception as e:
-                st.error(f"Lỗi: {e}")
+                except Exception as e:
+                    st.error(f"Lỗi: {e}")
 
     # Hướng dẫn nhập liệu (chỉ trong tab nhập liệu trực tiếp)
     st.markdown("---")
@@ -164,6 +170,7 @@ with tab1:
     Nhập danh sách **tên cột** và **giá trị mẫu** tương ứng theo cách song song:
     - Mỗi dòng của ô "Tên cột" tương ứng với một dòng của ô "Giá trị mẫu".
     - Số lượng dòng trong hai ô phải bằng nhau.
+    - Định dạng INTEGER giá trị mẫu điền chữ INT, mặc định số ở định dạng DOUBLE PRECISION
 
     **Ví dụ:**
     - Ô "Tên cột":
@@ -203,7 +210,7 @@ with tab2:
                 data = df.to_dict(orient="records")
 
                 # Sinh câu lệnh SQL
-                sql_output = generate_create_table_sql(data, table_name)
+                sql_output = generate_create_table_sql(data, full_table_name)
                 st.subheader("Code SQL CREATE TABLE:")
                 st.code(sql_output, language="sql")
 
@@ -225,6 +232,7 @@ with tab2:
     Tải lên tệp Excel (.xlsx) hoặc CSV (.csv) với cấu trúc:
     - **Cột 1**: Tên cột.
     - **Cột 2**: Giá trị mẫu.
+    - Định dạng INTEGER giá trị mẫu điền chữ INT, mặc định số ở định dạng DOUBLE PRECISION
 
     **Ví dụ:**
     | Tên cột         | Giá trị mẫu   |
