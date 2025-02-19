@@ -47,22 +47,19 @@ def infer_data_type(sample_value, column_name):
     if isinstance(sample_value, pd.Timestamp) or isinstance(sample_value, datetime.datetime):
         return "DATE"
     
-    # Loại bỏ các ký tự phân cách hàng nghìn (.,) và kiểm tra kiểu số
-    if isinstance(sample_value, str):
-        normalized_value = sample_value.replace(",", "").replace(".", "")
-        try:
-            # Kiểm tra nếu là số nguyên
-            int(normalized_value)
-            return "DOUBLE PRECISION"
-        except ValueError:
-            pass
+    # Kiểm tra nếu là số nguyên
+    try:
+        int(sample_value)
+        return "DOUBLE PRECISION"
+    except (ValueError, TypeError):
+        pass
 
-        try:
-            # Kiểm tra nếu là số thực
-            float(normalized_value)
-            return "DOUBLE PRECISION"
-        except ValueError:
-            pass
+    # Kiểm tra nếu là số thực
+    try:
+        float(sample_value)
+        return "DOUBLE PRECISION"
+    except (ValueError, TypeError):
+        pass
 
     # Kiểm tra nếu là ngày tháng dưới dạng chuỗi
     if isinstance(sample_value, str) and is_date_format(sample_value):
