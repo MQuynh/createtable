@@ -9,11 +9,17 @@ st.image("logo.png", use_container_width=False, width=150)  # width: điều ch�
 
 # Hàm chuẩn hóa tên cột
 def normalize_column_name(column_name):
+    # Bước 1: Chuẩn hóa tên cột
     column_name = column_name.replace('đ', 'd').replace('Đ', 'd')
     column_name = unicodedata.normalize('NFKD', column_name)
     column_name = ''.join(c for c in column_name if not unicodedata.combining(c))
     column_name = column_name.replace('%', 'pc')
     column_name = re.sub(r'\W+', '_', column_name.strip().lower())
+    column_name = column_name.strip('_')
+    if column_name in normalized_column_names:
+        print("Cảnh báo: Trùng tên cột")
+    else:
+        normalized_column_names.append(column_name)
     return column_name
 
 
