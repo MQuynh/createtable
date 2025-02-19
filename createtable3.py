@@ -46,6 +46,9 @@ def infer_data_type(sample_value, column_name):
     # Kiểm tra nếu giá trị mẫu là kiểu datetime
     if isinstance(sample_value, pd.Timestamp) or isinstance(sample_value, datetime.datetime):
         return "DATE"
+        
+    # Chuyển đổi các giá trị mẫu thành số nếu có thể
+    df['Giá trị mẫu'] = pd.to_numeric(df['Giá trị mẫu'], errors='ignore')
     
     # Loại bỏ các ký tự phân cách hàng nghìn (.,) và kiểm tra kiểu số
     if isinstance(sample_value, str):
