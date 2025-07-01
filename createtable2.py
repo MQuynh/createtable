@@ -86,8 +86,30 @@ def generate_create_table_sql(data, full_table_name):
 # Giao diện Streamlit
 st.title("Tạo Code SQL CREATE TABLE")
 
-# Nhập tên schema (không bắt buộc)
-schema_name = st.text_input("Nhập tên schema (tùy chọn, mặc định là 'public')", placeholder="Ví dụ: subpublic")
+# Thay thế dòng nhập schema_name bằng selectbox
+schema_options = [
+    "public",        # Giá trị mặc định đầu tiên
+    "subpublic",
+    "thc",
+    "the",
+    "ssg",
+    "thgreen",
+    "cmp",
+    "tte",
+    "thpc",
+    "thcorp",
+    "ce",
+    "tce",
+    "thi",
+    "thebh"
+]
+schema_name = st.selectbox(
+    "Chọn tên schema (tùy chọn, mặc định là 'public')",
+    schema_options,
+    index=0,  # Mặc định chọn phần tử đầu tiên (public)
+    key="schema_select"
+)
+
 
 # Nếu không nhập, sử dụng schema mặc định
 if not schema_name.strip():
