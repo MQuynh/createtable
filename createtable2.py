@@ -78,7 +78,6 @@ table_name = st.text_input("Nhập tên bảng", placeholder="Ví dụ: my_table
 schema_name = normalize_column_name(schema_name)
 table_name = normalize_column_name(table_name)
 full_table_name = f"{schema_name}.{table_name}"
-
 tab1, tab2 = st.tabs(["Nhập dữ liệu trực tiếp", "Đính kèm tệp"])
 
 with tab1:
