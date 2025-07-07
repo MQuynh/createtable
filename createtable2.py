@@ -72,7 +72,34 @@ def generate_create_table_sql(data, full_table_name):
 # Giao diện Streamlit
 st.title("Tạo Code SQL CREATE TABLE")
 
-schema_name = st.text_input("Nhập tên schema", placeholder="Ví dụ: subpublic") or "public"
+# Thay thế dòng nhập schema_name bằng selectbox
+schema_options = [
+    "public",        # Giá trị mặc định đầu tiên
+    "subpublic",
+    "thc",
+    "the",
+    "ssg",
+    "thgreen",
+    "cmp",
+    "tte",
+    "thpc",
+    "thcorp",
+    "ce",
+    "tce",
+    "thi",
+    "thebh"
+]
+schema_name = st.selectbox(
+    "Chọn tên schema (tùy chọn, mặc định là 'public')",
+    schema_options,
+    index=0,  # Mặc định chọn phần tử đầu tiên (public)
+    key="schema_select"
+)
+
+
+# Nếu không nhập, sử dụng schema mặc định
+if not schema_name.strip():
+    schema_name = "public"
 table_name = st.text_input("Nhập tên bảng", placeholder="Ví dụ: my_table") or "table_name"
 
 schema_name = normalize_column_name(schema_name)
@@ -119,6 +146,29 @@ with tab1:
             st.download_button("Tải xuống file Excel", output.getvalue(), excel_file_name, 
                                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
                                key="download_excel")
+# Hướng dẫn nhập liệu (chỉ trong tab nhập liệu trực tiếp)
+    st.markdown("---")
+    st.write("""
+    ### Hướng dẫn nhập liệu
+    Nhập danh sách **tên cột** và **giá trị mẫu** tương ứng theo cách song song:
+    - Mỗi dòng của ô "Tên cột" tương ứng với một dòng của ô "Giá trị mẫu".
+    - Số lượng dòng trong hai ô phải bằng nhau.
+    - Định dạng INTEGER giá trị mẫu điền chữ INT, mặc định số ở định dạng DOUBLE PRECISION
+
+    **Ví dụ:**
+    - Ô "Tên cột":
+        ```
+        Ngân hàng
+        Ngày giao dịch
+        Số tiền
+        ```
+    - Ô "Giá trị mẫu":
+        ```
+        ACB
+        01/01/2025
+        8000
+        ```
+    """)
 
 with tab2:
     uploaded_file = st.file_uploader("Tải lên tệp Excel hoặc CSV", type=["xlsx", "csv"])
@@ -148,3 +198,19 @@ with tab2:
                                key="download_excel_file")
         else:
             st.error("Tệp không hợp lệ. Định dạng phải có ít nhất 2 cột: 'Tên cột' và 'Giá trị mẫu'.")
+# Hướng dẫn đính kèm tệp (chỉ trong tab đính kèm tệp)
+    st.markdown("---")
+    st.write("""
+    ### Hướng dẫn đính kèm tệp
+    Tải lên tệp Excel (.xlsx) hoặc CSV (.csv) với cấu trúc:
+    - **Cột 1**: Tên cột.
+    - **Cột 2**: Giá trị mẫu.
+    - Định dạng INTEGER giá trị mẫu điền chữ INT, mặc định số ở định dạng DOUBLE PRECISION
+
+    **Ví dụ:**
+    | Tên cột         | Giá trị mẫu   |
+    |------------------|---------------|
+    | Ngân hàng       | ACB  |
+    | Ngày giao dịch       | 01/01/2025    |
+    | Số tiền | 1000           |
+    """)
