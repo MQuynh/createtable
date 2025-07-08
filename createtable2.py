@@ -87,7 +87,8 @@ schema_options = [
     "ce",
     "tce",
     "thi",
-    "thebh"
+    "thebh",
+    "dp"
 ]
 schema_name = st.selectbox(
     "Chọn tên schema (tùy chọn, mặc định là 'public')",
