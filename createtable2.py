@@ -15,6 +15,7 @@ def normalize_column_name(column_name):
     column_name = ''.join(c for c in column_name if not unicodedata.combining(c))
     column_name = column_name.replace('%', 'pc')
     column_name = re.sub(r'\W+', '_', column_name.strip().lower())
+    column_name = column_name.rstrip('_')  
     return column_name
 
 # Hàm kiểm tra định dạng ngày
